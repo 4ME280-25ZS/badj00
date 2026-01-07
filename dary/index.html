@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seznam dárků</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Seznam dárků</h1>
+            <p>Vyberte si dárek, který chcete koupit, a zamluvte si ho.</p>
+        </header>
+        <main>
+            <ul id="gift-list"></ul>
+        </main>
+        <footer>
+            <p>&copy; 2026 Seznam dárků</p>
+        </footer>
+    </div>
+    <script>
+    // Připojení k Supabase
+    const SUPABASE_URL = 'https://ufkkkeyqbidwukmtgpio.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVma2trZXlxYmlkd3VrbXRncGlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3Njg0OTIsImV4cCI6MjA4MzM0NDQ5Mn0.ck4agDHyyn5lc8uayUxHxeGtRwWnQ9fY20kapnG3lBM';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function loadGifts() {
+        const { data, error } = await supabase.from('gifts').select('*');
+        const list = document.getElementById('gift-list');
+        list.innerHTML = '';
+        if (error) {
+            list.innerHTML = '<li>Chyba při načítání darů.</li>';
+            return;
+        }
+        data.forEach(gift => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${gift.nazev}</strong> ` +
+                (gift.rezervovano ? `<span>Rezervoval: ${gift.rezervoval_jmeno}</span>` : `<button onclick=\"reserveGift(${gift.id})\">Zamluvit</button>`);
+            list.appendChild(li);
+        });
+    }
+
+    async function reserveGift(id) {
+        const jmeno = prompt('Zadejte své jméno:');
+        if (!jmeno) return;
+        const { error } = await supabase.from('gifts').update({ rezervovano: true, rezervoval_jmeno: jmeno }).eq('id', id);
+        if (error) alert('Chyba při rezervaci.');
+        loadGifts();
+    }
+
+    loadGifts();
+    </script>
+</body>
+</html>
