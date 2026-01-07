@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist dárků</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Wishlist dárků</h1>
+            <p>Přidávej dárky a označ, kdo je kupuje.</p>
+        </header>
+        <main>
+            <section id="add-gift">
+                <h2>Přidat dárek</h2>
+                <input type="text" id="new-gift-name" placeholder="Název dárku" />
+                <button id="add-gift-button">Přidat</button>
+            </section>
+
+            <h2>Seznam dárků</h2>
+            <ul id="gift-list"></ul>
+        </main>
+        <footer>
+            <p>&copy; 2026 Wishlist dárků</p>
+        </footer>
+    </div>
+
+    <script>
+    // Připojení k Supabase (tvůj projekt)
+    const SUPABASE_URL = 'https://ufkkkeyqbidwukmtgpio.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVma2trZXlxYmlkd3VrbXRncGlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3Njg0OTIsImV4cCI6MjA4MzM0NDQ5Mn0.ck4agDHyyn5lc8uayUxHxeGtRwWnQ9fY20kapnG3lBM';
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function loadGifts() {
+        const { data, error } = await client
+            .from('gifts')
+            .select('*')
+            .order('id', { ascending: true });
+
+        const list = document.getElementById('gift-list');
+        list.innerHTML = '';
+
+        if (error) {
+            list.innerHTML = '<li>Chyba při načítání darů.</li>';
+            return;
+        }
+
+        data.forEach(gift => {
+            const li = document.createElement('li');
+
+            const label = document.createElement('label');
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = !!gift.rezervovano;
+            checkbox.addEventListener('change', () => toggleBought(gift.id, checkbox.checked));
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'gift-name';
+            nameSpan.textContent = gift.nazev;
+
+            label.appendChild(checkbox);
+            label.appendChild(nameSpan);
+
+            if (gift.rezervovano && gift.rezervoval_jmeno) {
+                const buyerSpan = document.createElement('span');
+                buyerSpan.className = 'buyer';
+                buyerSpan.textContent = `(koupil: ${gift.rezervoval_jmeno})`;
+                label.appendChild(buyerSpan);
+            }
+
+            li.appendChild(label);
+            list.appendChild(li);
+        });
+    }
+
+    async function toggleBought(id, checked) {
+        if (!checked) {
+            const { error } = await client
+                .from('gifts')
+                .update({ rezervovano: false, rezervoval_jmeno: null })
+                .eq('id', id);
+            if (error) alert('Chyba při změně stavu.');
+            loadGifts();
+            return;
+        }
+
+        const jmeno = prompt('Zadejte své jméno (kdo dárek koupí):');
+        if (!jmeno) {
+            loadGifts();
+            return;
+        }
+        const { error } = await client
+            .from('gifts')
+            .update({ rezervovano: true, rezervoval_jmeno: jmeno })
+            .eq('id', id);
+        if (error) alert('Chyba při uložení informace.');
+        loadGifts();
+    }
+
+    async function addGift() {
+        const input = document.getElementById('new-gift-name');
+        const nazev = input.value.trim();
+        if (!nazev) {
+            alert('Zadejte prosím název dárku.');
+            return;
+        }
+        const { error } = await client
+            .from('gifts')
+            .insert({ nazev, rezervovano: false, rezervoval_jmeno: null });
+        if (error) {
+            alert('Chyba při přidávání dárku.');
+            return;
+        }
+        input.value = '';
+        loadGifts();
+    }
+
+    document.getElementById('add-gift-button').addEventListener('click', addGift);
+
+    loadGifts();
+    </script>
+</body>
+</html>
