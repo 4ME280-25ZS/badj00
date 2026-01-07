@@ -1,0 +1,70 @@
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-style: italic;
+}
+
+main {
+    padding: 20px;
+    padding-bottom: 80px;
+}
+
+#imageContainer {
+    background-image: url('./john doe.jfif');
+    background-size: cover;
+    background-position: center;
+    height: 300px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+#postForm {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 700px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+#postForm p,
+#postForm label {
+    text-align: center;
+}
+
+#postForm textarea {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
+}
+
+#postForm button {
+    display: block;
+    margin: 15px auto 0 auto;
+}
+
+#postForm label {
+    display: block;
+    width: 100%;
+    margin: 0 auto 8px auto;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
