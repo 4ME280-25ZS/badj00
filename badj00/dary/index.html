@@ -73,6 +73,19 @@
             }
 
             li.appendChild(label);
+            
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'delete-gift';
+            deleteButton.textContent = 'Smazat';
+            deleteButton.addEventListener('click', async (event) => {
+                event.stopPropagation();
+                event.preventDefault();
+                if (confirm('Opravdu chceš tento dárek odstranit?')) {
+                    await deleteGift(gift.id);
+                }
+            });
+
+            li.appendChild(deleteButton);
             list.appendChild(li);
         });
     }
@@ -98,6 +111,20 @@
             .update({ rezervovano: true, rezervoval_jmeno: jmeno })
             .eq('id', id);
         if (error) alert('Chyba při uložení informace.');
+        loadGifts();
+    }
+
+    async function deleteGift(id) {
+        const { error } = await client
+            .from('gifts')
+            .delete()
+            .eq('id', id);
+
+        if (error) {
+            alert('Chyba při mazání dárku.');
+            return;
+        }
+
         loadGifts();
     }
 

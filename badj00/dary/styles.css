@@ -61,6 +61,21 @@ main {
     color: #555;
 }
 
+#gift-list .delete-gift {
+    margin-left: auto;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 4px;
+    background: #f44336;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.85em;
+}
+
+#gift-list .delete-gift:hover {
+    background: #d32f2f;
+}
+
 footer {
     text-align: center;
     color: #888;
